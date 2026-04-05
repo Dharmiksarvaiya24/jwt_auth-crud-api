@@ -1,4 +1,6 @@
 const express = require('express');
+const cors  = require('cors');
+
 const app = express();
 
 require('dotenv').config();
@@ -15,6 +17,7 @@ connectDB(process.env.MongoDB_URI).then(() => {
 });
 
 //Middleware
+app.use(cors());
 app.use(express.urlencoded({extended: false}));
 app.use(log);
 
