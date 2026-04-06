@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -6,15 +7,45 @@ const Signup = () => {
     email: '',
     password: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Signup:', formData);
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8080/user/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Signup failed');
+      }
+
+      if (data.token) {
+        localStorage.setItem('authToken', data.token);
+      }
+
+      navigate('/home');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,6 +55,8 @@ const Signup = () => {
         <h2 className="mt-4 text-2xl font-bold text-center">Sign Up</h2>
         <h5 className="text-lg text-gray-600 text-center">Create your account</h5>
 
+        {error && <p className="mt-4 text-red-600 text-sm">{error}</p>}
+
         <form onSubmit={handleSubmit} className="w-full mt-6 space-y-4">
           <input
             type="text"
@@ -31,6 +64,7 @@ const Signup = () => {
             placeholder="Name"
             value={formData.name}
             onChange={handleChange}
+            required
             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
@@ -39,6 +73,7 @@ const Signup = () => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
+            required
             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
@@ -47,13 +82,15 @@ const Signup = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
+            required
             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
           >
-            Sign Up
+            {loading ? 'Signing up...' : 'Sign Up'}
           </button>
           <p className="text-sm text-gray-600 text-center">Already have an account? <a href="/login" className="text-blue-500 hover:underline">Login</a></p>
         </form>

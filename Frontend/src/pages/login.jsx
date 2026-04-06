@@ -6,6 +6,8 @@ const Login = () => {
     email: '',
     password: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -13,17 +15,42 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login:', formData);
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8080/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      navigate('/home');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-screen h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white rounded-lg w-96 h-auto flex flex-col items-center shadow-xl p-8">
-         <img src="https://png.pngtree.com/png-vector/20190507/ourmid/pngtree-vector-airplane-icon-png-image_1024816.jpg" alt="Signup Icon" className="w-10 h-10" />
+        <img src="https://png.pngtree.com/png-vector/20190507/ourmid/pngtree-vector-airplane-icon-png-image_1024816.jpg" alt="Login Icon" className="w-10 h-10" />
         <h2 className="text-2xl font-bold text-center">Login</h2>
         <h5 className="text-lg text-gray-600 text-center">Welcome back</h5>
+
+        {error && <p className="mt-4 text-red-600 text-sm">{error}</p>}
 
         <form onSubmit={handleSubmit} className="w-full mt-6 space-y-4">
           <input
@@ -32,6 +59,7 @@ const Login = () => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
+            required
             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
@@ -40,13 +68,15 @@ const Login = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
+            required
             className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
           <p className="text-sm text-gray-600 text-center">Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign up</a></p>
         </form>
