@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +34,8 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
-
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       navigate('/home');
     } catch (err) {
       setError(err.message);
@@ -78,7 +79,12 @@ const Login = () => {
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
-          <p className="text-sm text-gray-600 text-center">Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign up</a></p>
+          <p className="text-sm text-gray-600 text-center">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-blue-500 hover:underline">
+              Sign up
+            </Link>
+          </p>
         </form>
       </div>
     </div>

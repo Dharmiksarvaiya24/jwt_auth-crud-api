@@ -3,6 +3,17 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Signup from './pages/signup';
 import Login from './pages/login';
 import Home from './pages/home';
+import NotFound from './pages/404';
+
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('accessToken');
+
+  if (!token) {
+    return <Navigate to="/*" replace />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
@@ -10,8 +21,16 @@ function App() {
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/" element={<Navigate to="/signup" />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/" element={<Navigate to="/signup" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

@@ -8,23 +8,70 @@ const Home = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchFlights();
-  }, []);
+    const handleTokenRefresh = async () => {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
 
-  const fetchFlights = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/details');
-      const data = await response.json();
-      setFlights(data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch flights');
-      setLoading(false);
-    }
-  };
+        if (!refreshToken) {
+          return false;
+        }
+
+        const response = await fetch('http://localhost:8080/user/refresh-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ refreshToken })
+        });
+
+        if (!response.ok) {
+          return false;
+        }
+
+        const data = await response.json();
+        localStorage.setItem('accessToken', data.accessToken);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const fetchFlights = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch('http://localhost:8080/api/details', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401) {
+          const refreshed = await handleTokenRefresh();
+
+          if (refreshed) {
+            return fetchFlights();
+          }
+
+          navigate('/login');
+          return;
+        }
+
+        const data = await response.json();
+        setFlights(data);
+        setLoading(false);
+      } catch {
+        setError('Failed to fetch flights');
+        setLoading(false);
+      }
+    };
+
+    fetchFlights();
+  }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
+    // Bug Fix #3: Clear both tokens on logout
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     navigate('/login');
   };
 
@@ -32,7 +79,7 @@ const Home = () => {
     <div className="w-screen h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Flight Booking</h1>
+          <h1 className="text-4xl font-bold">Flight Booking {localStorage.getItem('username')} </h1>
           <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
             Logout
           </button>
