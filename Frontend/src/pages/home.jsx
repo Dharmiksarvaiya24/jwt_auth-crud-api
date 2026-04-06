@@ -16,7 +16,7 @@ const Home = () => {
           return false;
         }
 
-        const response = await fetch('http://localhost:8080/user/refresh-token', {
+        const response = await fetch('https://curd-api-chc6.onrender.com/user/refresh-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ const Home = () => {
     const fetchFlights = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch('http://localhost:8080/api/details', {
+        const response = await fetch('https://curd-api-chc6.onrender.com/api/details', {
           headers: {
             Authorization: `Bearer ${token}`
           }
