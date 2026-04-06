@@ -28,6 +28,7 @@ app.use(log);
 app.use('/user', userrouter);
 app.use('/api/details',auth, datarouter);
 
-app.listen(8080, () => {
-    console.log(`Server is running on port 8080`);
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
