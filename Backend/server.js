@@ -25,10 +25,14 @@ app.use(express.urlencoded({extended: false}));
 app.use(log);
 
 // routes
+app.get('/', (  req, res) => {
+    res.send("Backend is Running");
+});
+
 app.use('/user', userrouter);
 app.use('/api/details',auth, datarouter);
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
+
 const Home = () => {
   const navigate = useNavigate();
   const [flights, setFlights] = useState([]);
@@ -16,7 +18,7 @@ const Home = () => {
           return false;
         }
 
-        const response = await fetch('https://curd-api-chc6.onrender.com/user/refresh-token', {
+  const response = await fetch(`${API_BASE}/user/refresh-token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -39,7 +41,7 @@ const Home = () => {
     const fetchFlights = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch('https://curd-api-chc6.onrender.com/api/details', {
+        const response = await fetch(`${API_BASE}/api/details`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// API base from env
+const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -21,7 +24,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://curd-api-chc6.onrender.com/user/login', {
+      const response = await fetch(`${API_BASE}/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

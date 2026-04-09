@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// use Vite env for API base
+const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
+
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -22,7 +25,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://curd-api-chc6.onrender.com/user/signup', {
+      const response = await fetch(`${API_BASE}/user/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
