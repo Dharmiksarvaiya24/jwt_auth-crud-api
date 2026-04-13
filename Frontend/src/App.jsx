@@ -4,12 +4,14 @@ import Signup from './pages/signup';
 import Login from './pages/login';
 import Home from './pages/home';
 import NotFound from './pages/404';
+import Otp from './pages/otp';
+import OtpProtectRoute from './components/otpprotectroute';
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('accessToken');
 
   if (!token) {
-    return <Navigate to="/*" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -21,6 +23,14 @@ function App() {
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/otp"
+          element={
+            <OtpProtectRoute>
+              <Otp />
+            </OtpProtectRoute>
+          }
+        />
         <Route
           path="/home"
           element={

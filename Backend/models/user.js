@@ -17,7 +17,27 @@ const userdetails = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+
+
+  otpHash: {
+    type: String,
+    required: false
+  },
+   otpExpiry: {
+    type: Date,
+    required: false
+  },
+  otppurpose: {
+    type: String,
+    required: false
+  },
+  otpnumber: {
+    type: Number,
+    required: false
   }
+
+  
 },
     { timestamps : true}
 );

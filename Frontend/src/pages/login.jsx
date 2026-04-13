@@ -37,9 +37,25 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      navigate('/home');
+
+      // OTP flow: backend returns needsOtp instead of tokens
+      if (data.needsOtp) {
+        sessionStorage.setItem('pendingEmail', data.email || formData.email);
+        sessionStorage.setItem('pendingPurpose', data.purpose || 'login');
+        navigate('/otp');
+        return;
+      }
+
+      // Fallback (if backend still returns tokens directly)
+      if (data.accessToken && data.refreshToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        if (data.user?.name) localStorage.setItem('username', data.user.name);
+        navigate('/home');
+        return;
+      }
+
+      throw new Error('Unexpected response from server');
     } catch (err) {
       setError(err.message);
     } finally {

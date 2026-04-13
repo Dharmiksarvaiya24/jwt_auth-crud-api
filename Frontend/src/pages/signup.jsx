@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-// use Vite env for API base
+  
 const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
 
 const Signup = () => {
@@ -39,9 +38,24 @@ const Signup = () => {
         throw new Error(data.message || 'Signup failed');
       }
 
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      navigate('/home');
+      // OTP flow: backend returns needsOtp instead of tokens
+      if (data.needsOtp) {
+        sessionStorage.setItem('pendingEmail', data.email || formData.email);
+        sessionStorage.setItem('pendingPurpose', data.purpose || 'signup');
+        navigate('/otp');
+        return;
+      }
+
+      // Fallback (if backend still returns tokens directly)
+      if (data.accessToken && data.refreshToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        if (data.user?.name) localStorage.setItem('username', data.user.name);
+        navigate('/home');
+        return;
+      }
+
+      throw new Error('Unexpected response from server');
     } catch (err) {
       setError(err.message);
     } finally {

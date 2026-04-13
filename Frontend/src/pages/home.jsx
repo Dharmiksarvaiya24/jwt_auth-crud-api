@@ -71,7 +71,7 @@ const Home = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    // Bug Fix #3: Clear both tokens on logout
+    localStorage.clear();
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     navigate('/login');
@@ -81,7 +81,7 @@ const Home = () => {
     <div className="w-screen h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Flight Booking {localStorage.getItem('username')} </h1>
+          <h1 className="text-4xl font-bold">Welcome {localStorage.getItem('username') || 'User'} </h1>
           <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
             Logout
           </button>

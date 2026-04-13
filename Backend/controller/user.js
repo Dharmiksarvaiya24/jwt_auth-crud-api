@@ -1,5 +1,9 @@
 const userdata = require("../models/user");
 const jwt =require('jsonwebtoken');
+const crypto = require("crypto");
+const { sendOTP } = require("./otp");
+
+
 
 async function createuser(req, res) {
     try {
@@ -16,27 +20,29 @@ async function createuser(req, res) {
 
         const user = new userdata({ name, email, password });
 
-        // Bug Fix #2: Save user to the database
+        const otp = String(Math.floor(1000 + Math.random() * 9000));
+        const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+        user.otpHash = otpHash;
+        user.otpExpiry = Date.now() + 10 * 60 * 1000; 
+        user.otppurpose = "signup";
+        user.otpattempts = 0;
         await user.save();
 
-        // Bug Fix #1: Generate a real refreshToken JWT (removed nested function)
-        const accessToken = jwt.sign(
-            { userId: user._id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: "15m" }
-        );
+       try{
+        await sendOTP(user.email, otp);
+         } catch (error) {
+            console.error("Error sending OTP:", error);
+            return res.status(500).json({message: "Failed to send OTP"});
+        }
 
-        const refreshToken = jwt.sign(
-            { userId: user._id },
-            process.env.REFRESH_SECRET,
-            { expiresIn: "7d" }
-        );
+       return res.status(201).json({
+        message: "OTP sent to email",
+        needsOtp: true,
+        email: user.email,
+        purpose: "signup",
+       
+    });
 
-        return res.status(201).json({
-            message: "User created successfully",
-            accessToken,
-            refreshToken,
-        });
     } catch (error) {
         return res.status(500).json({message: "Failed to create user"});
     }
@@ -82,25 +88,102 @@ async function getuser(req, res) {
             return res.status(401).json({message: "Invalid credentials"});
         }
 
-    const accessToken = jwt.sign(
-        { userId: user._id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: "15m" }
-    );
-    const refreshToken = jwt.sign(
-        { userId: user._id },
-        process.env.REFRESH_SECRET,
-        { expiresIn: "7d" }
-    );
-    return res.json({
-        message: "Login successful",
-        accessToken,
-        refreshToken,
+         const otp = String(Math.floor(1000 + Math.random() * 9000));
+        const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+        user.otpHash = otpHash;
+        user.otpExpiry = Date.now() + 10 * 60 * 1000; 
+        user.otppurpose = "login";
+        user.otpattempts = 0;
+        await user.save();
+
+       try{
+        await sendOTP(user.email, otp);
+         } catch (error) {
+            console.error("Error sending OTP:", error);
+            return res.status(500).json({message: "Failed to send OTP"});
+        }
+
+     return res.status(201).json({
+        message: "OTP sent to email",
+        needsOtp: true,
+        email: user.email,
+        purpose: "login",
+       
     });
 
     } catch (error) {
         return res.status(500).json({message: "Login failed"});
     }
+}
+
+async function verifyOtp(req, res) {
+  try {
+    const { email, otp, purpose } = req.body;
+
+    if (!email || !otp || !purpose) {
+      return res.status(400).json({ message: "email, otp, purpose are required" });
+    }
+
+    const user = await userdata.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.otpHash || !user.otpExpiry || !user.otppurpose) {
+      return res.status(400).json({ message: "No OTP found. Please login/signup again." });
+    }
+
+    if (user.otppurpose !== purpose) {
+      return res.status(400).json({ message: "OTP purpose mismatch" });
+    }
+
+    const expiryMs = new Date(user.otpExpiry).getTime();
+    if (!expiryMs || Date.now() > expiryMs) {
+      user.otpHash = undefined;
+      user.otpExpiry = undefined;
+      user.otppurpose = undefined;
+      user.otpattempts = 0;
+      await user.save();
+      return res.status(400).json({ message: "OTP expired. Please resend OTP." });
+    }
+
+    const attempts = Number(user.otpattempts || 0);
+    if (attempts >= 3) {
+      return res.status(429).json({ message: "Too many attempts. Please resend OTP." });
+    }
+
+    const otpHash = crypto.createHash("sha256").update(String(otp)).digest("hex");
+    if (otpHash !== user.otpHash) {
+      user.otpattempts = attempts + 1;
+      await user.save();
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    user.otpHash = undefined;
+    user.otpExpiry = undefined;
+    user.otppurpose = undefined;
+    user.otpattempts = 0;
+    await user.save();
+
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      message: "OTP verified",
+      accessToken,
+      refreshToken,
+      user: { name: user.name, email: user.email },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "OTP verification failed" });
+  }
 }
 
 async function refreshToken(req, res) {
@@ -129,4 +212,5 @@ module.exports = {
     getuser,
     deleteuser,
     refreshToken,
+    verifyOtp,
 };
