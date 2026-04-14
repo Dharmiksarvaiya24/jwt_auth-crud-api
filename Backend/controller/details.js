@@ -27,17 +27,15 @@ async function createdetails(req, res) {
         if(
             !body ||
             !body.id ||
-            !body.name ||
             !body.time ||
             !body.departure ||
             !body.arrival
         )
         {
-                return res.status(400).json({message: "All fields are req..."});
+                return res.status(400).json({message: "All fields are required"});
         }
   const result = await flightdata.create({
     id: body.id,
-    name: body.name,
     time: body.time,
     departure: body.departure,
     arrival: body.arrival

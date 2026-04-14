@@ -10,9 +10,9 @@ const{
     } = require("../controller/details");
 
 router.get("/", getDetails);
-router.get("/:id",getDetailsById);
-router.patch("/api/:id",updatedetails);
-router.delete("/api/:id",deletedetails);
-router.post("/api",createdetails);
+router.get("/:id", getDetailsById);
+router.post("/", createdetails);
+router.patch("/:id", updatedetails);
+router.delete("/:id", deletedetails);
 
 module.exports = router;
