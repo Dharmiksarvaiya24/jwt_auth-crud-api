@@ -13,13 +13,29 @@ async function getDetailsById(req, res) {
 }
 
 async function updatedetails(req, res) {
-    await flightdata.findOneAndUpdate({id: req.params.id}, { name : "6E2799" });
-    return res.json({message: "Success"});
+    const { ObjectId } = require("mongoose").Types;
+    try {
+        const result = await flightdata.findByIdAndUpdate(new ObjectId(req.params.id), req.body, { new: true });
+        if (!result) {
+            return res.status(404).json({message: "Flight not found"});
+        }
+        return res.json({message: "Success", result});
+    } catch (err) {
+        return res.status(400).json({message: "Invalid ID format"});
+    }
 }
 
 async function deletedetails(req, res) {
-    await flightdata.findOneAndDelete({id: req.params.id});
-    return res.json({message: "Success"});
+    const { ObjectId } = require("mongoose").Types;
+    try {
+        const result = await flightdata.findByIdAndDelete(new ObjectId(req.params.id));
+        if (!result) {
+            return res.status(404).json({message: "Flight not found"});
+        }
+        return res.json({message: "Flight deleted successfully"});
+    } catch (err) {
+        return res.status(400).json({message: "Invalid ID format"});
+    }
 }
 
 async function createdetails(req, res) {
