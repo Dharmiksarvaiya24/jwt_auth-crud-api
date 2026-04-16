@@ -11,8 +11,7 @@ async function sendOTP(email, otp) {
     html: `<h2>
     Dear Customer,
     We are welcoming you!
-    To proceed with your request, please use the One-Time Password (OTP) provided below:
-    Your OTP: ${otp}
+    To proceed with your request, please use Your OTP: ${otp}
 
     This OTP is valid for a 10 Minutes. Please do not share it with anyone for security reasons.
     Thank you for choosing Flight Management.
