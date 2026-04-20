@@ -136,7 +136,7 @@ const EditFlightModal = ({ apiBase, refreshToken, onUnauthorized, onUpdated, fli
                 value={form.id}
                 onChange={(e) => setForm((p) => ({ ...p, id: e.target.value }))}
                 className="rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="e.g. 6E2799"
+             
               />
             </label>
 
@@ -148,7 +148,7 @@ const EditFlightModal = ({ apiBase, refreshToken, onUnauthorized, onUpdated, fli
                 value={form.time}
                 onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
                 className="rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="e.g. 10:30"
+   
               />
             </label>
 
@@ -160,7 +160,7 @@ const EditFlightModal = ({ apiBase, refreshToken, onUnauthorized, onUpdated, fli
                 value={form.departure}
                 onChange={(e) => setForm((p) => ({ ...p, departure: e.target.value }))}
                 className="rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="e.g. DEL"
+             
               />
             </label>
 
@@ -172,7 +172,7 @@ const EditFlightModal = ({ apiBase, refreshToken, onUnauthorized, onUpdated, fli
                 value={form.arrival}
                 onChange={(e) => setForm((p) => ({ ...p, arrival: e.target.value }))}
                 className="rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="e.g. BOM"
+            
               />
             </label>
           </div>

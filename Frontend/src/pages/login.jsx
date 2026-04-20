@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { BackgroundPaths } from '../components/ui/background-paths';
 
-// API base from env
 const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
 
 const Login = () => {
@@ -38,7 +38,6 @@ const Login = () => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // OTP flow: backend returns needsOtp instead of tokens
       if (data.needsOtp) {
         sessionStorage.setItem('pendingEmail', data.email || formData.email);
         sessionStorage.setItem('pendingPurpose', data.purpose || 'login');
@@ -46,7 +45,6 @@ const Login = () => {
         return;
       }
 
-      // Fallback (if backend still returns tokens directly)
       if (data.accessToken && data.refreshToken) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
@@ -64,49 +62,77 @@ const Login = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white rounded-lg w-96 h-auto flex flex-col items-center shadow-xl p-8">
-        <img src="https://png.pngtree.com/png-vector/20190507/ourmid/pngtree-vector-airplane-icon-png-image_1024816.jpg" alt="Login Icon" className="w-10 h-10" />
-        <h2 className="text-2xl font-bold text-center">Login</h2>
-        <h5 className="text-lg text-gray-600 text-center">Welcome back</h5>
+    <BackgroundPaths>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-white/95 dark:bg-black/80 backdrop-blur-md rounded-2xl w-full max-w-md flex flex-col items-center shadow-2xl p-8 border border-black/10 dark:border-white/10">
+         
+          
+          <h2 className="text-3xl font-bold text-center text-black dark:text-white">Welcome Back</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">Sign in to your account</p>
 
-        {error && <p className="mt-4 text-red-600 text-sm">{error}</p>}
+          {error && (
+            <div className="mt-4 w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-lg p-3">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="w-full mt-6 space-y-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-          <p className="text-sm text-gray-600 text-center">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-500 hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </form>
+          <form onSubmit={handleSubmit} className="w-full mt-8 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-900 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-900 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-2.5 rounded-lg transition duration-200 transform hover:scale-105 disabled:hover:scale-100"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Logging in...
+                </span>
+              ) : (
+                'Login'
+              )}
+            </button>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-6">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-blue-500 hover:text-blue-600 font-semibold transition">
+                Create one
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
-    </div>
+    </BackgroundPaths>
   );
 };
 
