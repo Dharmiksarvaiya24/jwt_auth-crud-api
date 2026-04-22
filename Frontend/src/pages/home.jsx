@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { GridVignetteBackground } from '@/components/ui/vignette-grid-background';
 import AddFlightModal from '../components/AddFlightModal';
 import EditFlightModal from '../components/EditFlightModal';
 
@@ -121,22 +123,63 @@ const Home = () => {
     navigate('/login');
   };
 
-  return (
-    <div className="w-screen h-screen bg-gray-100 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Welcome {localStorage.getItem('username')} </h1>
-          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
-            Logout
-          </button>
-        </div>
+  const username = localStorage.getItem('username') || 'traveler';
 
-        <AddFlightModal
-          apiBase={API_BASE}
-          refreshToken={handleTokenRefresh}
-          onUnauthorized={() => navigate('/login')}
-          onCreated={(flight) => setFlights((prev) => [flight, ...prev])}
-        />
+  return (
+    <div className="relative isolate min-h-screen overflow-hidden bg-black px-4 py-6 sm:px-6 lg:px-8">
+      <GridVignetteBackground
+        className="opacity-100"
+        x={50}
+        y={18}
+        intensity={68}
+        horizontalVignetteSize={90}
+        verticalVignetteSize={65}
+      />
+
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col">
+        <section className="rounded-[2rem] border border-slate-800 bg-slate-950/90 p-6 shadow-[0_30px_120px_-48px_rgba(15,23,42,0.7)] backdrop-blur-md sm:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl space-y-3">
+              <p className="text-sm font-medium uppercase tracking-[0.35em] text-slate-400">
+                Flight Dashboard
+              </p>
+              <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                Welcome back, {username}
+              </h1>
+              <p className="max-w-2xl text-base text-slate-300 sm:text-lg">
+                Manage your departures, arrivals, and schedules from one calm control
+                panel with a cleaner view of every route.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="rounded-[1.5rem] border border-slate-700 bg-slate-800 px-5 py-4 text-white shadow-lg shadow-black/40">
+                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
+                  Flights Tracked
+                </p>
+                <p className="mt-2 text-3xl font-semibold">
+                  {loading ? '...' : flights.length}
+                </p>
+              </div>
+
+              <AddFlightModal
+                apiBase={API_BASE}
+                refreshToken={handleTokenRefresh}
+                onUnauthorized={() => navigate('/login')}
+                onCreated={(flight) => setFlights((prev) => [flight, ...prev])}
+              />
+
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleLogout}
+                className="h-12 rounded-xl px-5 shadow-sm"
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+        </section>
 
         <EditFlightModal
           apiBase={API_BASE}
@@ -147,38 +190,107 @@ const Home = () => {
           isOpen={isEditModalOpen}
           onClose={handleEditClose}
         />
-	          
-        {loading && <p className="text-gray-600">Loading flights...</p>}
-        {error && <p className="text-red-600">{error}</p>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {flights.map((flight) => (
-		            <div key={flight._id} className="bg-white p-6 rounded-lg shadow-md relative pr-24">
-              <h3 className="text-xl font-bold mb-2">{flight.id}</h3>
-              <p className="text-gray-600">Time: {flight.time}</p>
-              <p className="text-gray-600">From: {flight.departure}</p>
-              <p className="text-gray-600">To: {flight.arrival}</p>
-              
-		              <div className="absolute right-6 top-6 flex items-center justify-start gap-4 flex-col">
-	                <button onClick={() => handleEdit(flight)} className="cursor-pointer flex items-center gap-2 text-blue-600">
-	                  <img
-	                    src="data:image/png;base64,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"
-	                    alt="Edit"
-	                    className="w-10 h-6"
-	                  />
-	                 
-	                </button>
-	                <button onClick={() => handleDelete(flight._id)} className="cursor-pointer flex items-center gap-2 text-red-600">
-	                  <img
-	                    src="data:image/png;base64,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"
-	                    alt="Delete"
-	                    className="w-6 h-6"
-	                  />
-	                </button>
-	              </div>
-	              </div>
-	          ))}
-	        </div>
+        {loading && (
+          <div className="mt-6 rounded-[1.5rem] border border-slate-800 bg-slate-900/70 px-5 py-4 text-slate-300 shadow-sm backdrop-blur">
+            Loading flights...
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-6 rounded-[1.5rem] border border-red-900 bg-red-950/85 px-5 py-4 text-red-300 shadow-sm">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && flights.length === 0 ? (
+          <div className="mt-6 flex flex-1 items-center justify-center rounded-[2rem] border border-dashed border-slate-700 bg-slate-900/65 px-6 py-16 text-center shadow-sm backdrop-blur">
+            <div className="max-w-xl">
+              <p className="text-sm font-medium uppercase tracking-[0.35em] text-slate-500">
+                Empty Manifest
+              </p>
+              <h3 className="mt-4 text-3xl font-semibold text-white">
+                Your dashboard is ready for its first flight.
+              </h3>
+              <p className="mt-3 text-slate-400">
+                Use the Add Flight action above to create a route and start tracking
+                your schedule from here.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-4 pb-6 md:grid-cols-2 xl:grid-cols-3">
+            {flights.map((flight) => (
+              <article
+                key={flight._id}
+                className="group rounded-[1.75rem] border border-slate-800 bg-slate-900/85 p-6 shadow-lg shadow-black/60 backdrop-blur-md transition-transform duration-200 hover:-translate-y-1"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
+                        Flight
+                      </p>
+                      <h3 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                        {flight.id}
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleEdit(flight)}
+                        className="rounded-full"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(flight._id)}
+                        className="rounded-full"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-800/50 p-4">
+                      <p className="text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
+                        Departure
+                      </p>
+                      <p className="mt-2 text-base font-semibold text-white">
+                        {flight.departure}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-800 bg-slate-800/50 p-4">
+                      <p className="text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
+                        Arrival
+                      </p>
+                      <p className="mt-2 text-base font-semibold text-white">
+                        {flight.arrival}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-800 bg-slate-800/50 p-4">
+                      <p className="text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
+                        Time
+                      </p>
+                      <p className="mt-2 text-base font-semibold text-white">
+                        {flight.time}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
