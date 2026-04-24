@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 
 const emptyForm = {
@@ -115,9 +116,9 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
         Add Flight
       </Button>
 
-      {open && (
+      {open && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 bg-black/50 p-4"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
@@ -149,7 +150,6 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
                     value={form.id}
                     onChange={(e) => setForm((p) => ({ ...p, id: e.target.value }))}
                     className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-400"
-          
                   />
                 </label>
 
@@ -161,7 +161,6 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
                     value={form.time}
                     onChange={(e) => setForm((p) => ({ ...p, time: e.target.value }))}
                     className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-400"
-            
                   />
                 </label>
 
@@ -173,7 +172,6 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
                     value={form.departure}
                     onChange={(e) => setForm((p) => ({ ...p, departure: e.target.value }))}
                     className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-400"
-               
                   />
                 </label>
 
@@ -185,7 +183,6 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
                     value={form.arrival}
                     onChange={(e) => setForm((p) => ({ ...p, arrival: e.target.value }))}
                     className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-400"
-                
                   />
                 </label>
               </div>
@@ -210,7 +207,7 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
               </div>
             </form>
           </div>
-        </div>
+        </div>, document.body
       )}
     </>
   );

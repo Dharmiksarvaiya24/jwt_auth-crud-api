@@ -170,7 +170,7 @@ const Otp = () => {
           {/* Success Message */}
           {message && (
             <div className="mt-4 w-full bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-xs sm:text-sm rounded-lg p-3 break-words flex items-start gap-2">
-              <span className="text-lg flex-shrink-0">✓</span>
+              <span className="text-lg flex-shrink-0"></span>
               <span>{message}</span>
             </div>
           )}

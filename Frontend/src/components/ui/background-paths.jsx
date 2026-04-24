@@ -24,26 +24,32 @@ function FloatingPaths({ position }) {
                 fill="none"
             >
                 <title>Background Paths</title>
-                {paths.map((path) => (
-                    <motion.path
-                        key={path.id}
-                        d={path.d}
-                        stroke="currentColor"
-                        strokeWidth={path.width}
-                        strokeOpacity={0.1 + path.id * 0.03}
-                        initial={{ pathLength: 0.3, opacity: 0.6 }}
-                        animate={{
-                            pathLength: 1,
-                            opacity: [0.3, 0.6, 0.3],
-                            pathOffset: [0, 1, 0],
-                        }}
-                        transition={{
-                            duration: 20 + Math.random() * 10,
-                            repeat: Infinity,
-                            ease: "linear",
-                        }}
-                    />
-                ))}
+                {paths.map((path) => {
+                    // deterministic duration and a small stagger per-path to avoid sync/jumps
+                    const duration = 20 + (path.id % 6) * 1.5; // 20..~28.5s
+                    const delay = (path.id % 10) * 0.12; // stagger start
+                    return (
+                        <motion.path
+                            key={path.id}
+                            d={path.d}
+                            stroke="currentColor"
+                            strokeWidth={path.width}
+                            strokeOpacity={Math.min(0.9, 0.08 + path.id * 0.02)}
+                            initial={{ pathLength: 0.3, opacity: 0.4, pathOffset: 0 }}
+                            animate={{
+                                pathLength: [0.3, 1],
+                                opacity: [0.3, 0.6, 0.3],
+                                pathOffset: [0, 1],
+                            }}
+                            transition={{
+                                duration,
+                                delay,
+                                repeat: Infinity,
+                                ease: 'linear',
+                            }}
+                        />
+                    );
+                })}
             </svg>
         </div>
     );
