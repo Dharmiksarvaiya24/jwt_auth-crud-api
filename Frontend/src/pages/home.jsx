@@ -169,14 +169,24 @@ const Home = () => {
                 onCreated={(flight) => setFlights((prev) => [flight, ...prev])}
               />
 
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleLogout}
-                className="h-12 rounded-xl px-5 shadow-sm"
-              >
-                Logout
-              </Button>
+              {/* user avatar */}
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleLogout}
+                  className="h-12 rounded-xl px-5 shadow-sm"
+                >
+                  Logout
+                </Button>
+                  <button
+                  type="button"
+                  aria-label={`User ${username}`}
+                  className="h-11 w-11 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center font-semibold shadow-sm"
+                >
+                  {String(username || 'T').charAt(0).toUpperCase()}
+                </button>
+              </div>
             </div>
           </div>
         </section>

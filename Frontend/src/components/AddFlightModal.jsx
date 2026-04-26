@@ -118,7 +118,7 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
 
       {open && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 bg-black/50 p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
