@@ -8,11 +8,13 @@ const{
         deletedetails,
         createdetails,
     } = require("../controller/details");
+const { auth } = require("../middelwares");
 
-router.get("/", getDetails);
-router.get("/:id", getDetailsById);
-router.post("/", createdetails);
-router.patch("/:id", updatedetails);
-router.delete("/:id", deletedetails);
+
+router.get("/", auth, getDetails);
+router.get("/:id", auth, getDetailsById);
+router.post("/", auth, createdetails);
+router.patch("/:id", auth, updatedetails);
+router.delete("/:id", auth, deletedetails);
 
 module.exports = router;
