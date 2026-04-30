@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { GridVignetteBackground } from '@/components/ui/vignette-grid-background';
@@ -14,6 +14,8 @@ const Home = () => {
   const [error, setError] = useState('');
   const [editingFlight, setEditingFlight] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
 
   const handleTokenRefresh = useCallback(async () => {
     try {
@@ -60,6 +62,17 @@ const Home = () => {
       setLoading(false);
     }
   }, [handleTokenRefresh, navigate]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchFlights();
@@ -169,23 +182,46 @@ const Home = () => {
                 onCreated={(flight) => setFlights((prev) => [flight, ...prev])}
               />
 
-              {/* user avatar */}
-              <div className="flex items-center gap-3">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleLogout}
-                  className="h-12 rounded-xl px-5 shadow-sm"
-                >
-                  Logout
-                </Button>
+              {/* user avatar with menu */}
+              <div className="flex items-center gap-3 relative" ref={userMenuRef}>
+                <div className="relative">
                   <button
-                  type="button"
-                  aria-label={`User ${username}`}
-                  className="h-11 w-11 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center font-semibold shadow-sm"
-                >
-                  {String(username || 'T').charAt(0).toUpperCase()}
-                </button>
+                    type="button"
+                    aria-label={`User ${username}`}
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="h-11 w-11 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center font-semibold shadow-sm hover:bg-slate-700 transition"
+                  >
+                    {String(username || 'T').charAt(0).toUpperCase()}
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-700 bg-slate-950 shadow-lg backdrop-blur z-[9999]">
+                      <div className="p-4 border-b border-slate-800">
+                        <p className="text-sm font-semibold text-white">{username}</p>
+                        <p className="text-xs text-slate-400">Account</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigate('/settings');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm text-slate-300 hover:bg-slate-800 transition"
+                      >
+                        Settings
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-950/30 transition border-t border-slate-800"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

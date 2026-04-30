@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Signup from './pages/signup';
 import Login from './pages/login';
 import Home from './pages/home';
+import Settings from './pages/settings';
 import NotFound from './pages/404';
 import Otp from './pages/otp';
 import OtpProtectRoute from './components/otpprotectroute';
@@ -36,6 +37,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />
