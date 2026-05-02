@@ -12,33 +12,17 @@ const Settings = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Protect route - redirect to login if no token
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchUser = async () => {
-      try {
-        // Try to get user info from local storage first, or fetch from backend
-        const storedName = localStorage.getItem('username');
-        const storedEmail = localStorage.getItem('email');
-        
-        setUser({
-          name: storedName || 'User',
-          email: storedEmail || 'No email stored',
-          createdAt: new Date()
-        });
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [navigate]);
+    // Load user info from local storage
+    const storedName = localStorage.getItem('username');
+    const storedEmail = localStorage.getItem('email');
+    
+    setUser({
+      name: storedName || 'User',
+      email: storedEmail || 'No email',
+      createdAt: new Date()
+    });
+    setLoading(false);
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -67,7 +51,7 @@ const Settings = () => {
           <div className="flex items-center gap-6">
             <button
               type="button"
-              onClick={() => navigate('/home')}
+              onClick={() => navigate(-1)}
               className="text-slate-400 hover:text-white transition text-2xl"
               aria-label="Go back"
             >

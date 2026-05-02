@@ -50,6 +50,7 @@ const Signup = () => {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         if (data.user?.name) localStorage.setItem('username', data.user.name);
+        if (data.user?.email) localStorage.setItem('email', data.user.email);
         navigate('/home');
         return;
       }

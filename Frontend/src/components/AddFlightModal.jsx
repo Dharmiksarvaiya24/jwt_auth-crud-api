@@ -111,9 +111,9 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
       <Button
         type="button"
         onClick={openModal}
-        className="h-11 rounded-xl px-5 shadow-lg shadow-slate-900/15"
+        className="h-12 rounded-xl px-6 shadow-sm hover:shadow-md transition"
       >
-        Add Flight
+        ➕ Add Flight
       </Button>
 
       {open && createPortal(
