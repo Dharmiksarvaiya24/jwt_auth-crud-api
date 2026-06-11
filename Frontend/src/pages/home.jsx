@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { GridVignetteBackground } from '@/components/ui/vignette-grid-background';
 import AddFlightModal from '../components/AddFlightModal';
 import EditFlightModal from '../components/EditFlightModal';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
+import { API_BASE } from '@/lib/api';
 
 const Home = () => {
   const navigate = useNavigate();

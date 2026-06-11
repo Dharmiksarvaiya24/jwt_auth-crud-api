@@ -14,6 +14,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
     "express": "^5.2.1",
+    "flightradar24-client": "^1.0.1",
+    "flightradarapi": "^1.5.1",
     "jsonwebtoken": "^9.0.3",
     "mongoos": "^0.0.1-security",
     "mongoose": "^9.3.3",

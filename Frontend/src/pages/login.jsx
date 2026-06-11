@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BackgroundPaths } from '../components/ui/background-paths';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
+import { API_BASE } from '@/lib/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({

@@ -14,6 +14,7 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [isFetchingFlight, setIsFetchingFlight] = useState(false);
   const idRef = useRef(null);
 
   const openModal = () => {
@@ -41,6 +42,56 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
     const t = setTimeout(() => idRef.current?.focus?.(), 0);
     return () => clearTimeout(t);
   }, [open]);
+
+  const handleFetchFlightData = async () => {
+    const flightNumber = form.id.trim().toUpperCase();
+    if (!flightNumber) {
+      setError('Please enter a flight ID to fetch data.');
+      return;
+    }
+
+    setIsFetchingFlight(true);
+    setError('');
+
+    try {
+      let token = localStorage.getItem('accessToken');
+      const base = String(apiBase || '').replace(/\/+$/, '');
+      const url = `${base}/api/flights/fetch-external?flightNumber=${encodeURIComponent(flightNumber)}`;
+
+      let response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // If token expired (401), try to refresh it
+      if (response.status === 401) {
+        const refreshed = await refreshToken?.();
+        if (refreshed) {
+          // Retry with new token
+          token = localStorage.getItem('accessToken');
+          response = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } else {
+          onUnauthorized?.();
+          return;
+        }
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Can't fetch this flight.");
+      }
+
+      // Pre-fill the form with the data from our backend
+      setForm(data);
+
+    } catch {
+      setError("Can't fetch this flight.");
+    } finally {
+      setIsFetchingFlight(false);
+    }
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -73,7 +124,7 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
         body: JSON.stringify(payload)
       });
 
-   
+
       if (response.status === 401) {
         const refreshed = await refreshToken?.();
         if (refreshed) {
@@ -103,7 +154,7 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
       setSaving(false);
     }
 
-    
+
   };
 
   return (
@@ -141,17 +192,29 @@ const AddFlightModal = ({ apiBase, refreshToken, onUnauthorized, onCreated }) =>
               {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 sm:col-span-2">
                   <span className="text-sm text-slate-300">Flight ID</span>
-                  <input
-                    ref={idRef}
-                    type="text"
-                    required
-                    value={form.id}
-                    onChange={(e) => setForm((p) => ({ ...p, id: e.target.value }))}
-                    className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-400"
-                  />
-                </label>
+                  <div className="flex gap-2">
+                    <input
+                      ref={idRef}
+                      type="text"
+                      required
+                      value={form.id}
+                      onChange={(e) => setForm((p) => ({ ...p, id: e.target.value }))}
+                      className="flex-grow rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-400"
+                      placeholder="Fetch the flight, we will provide info if we have it"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleFetchFlightData}
+                      disabled={isFetchingFlight}
+                      className="rounded-md border-slate-700 text-slate-300 hover:bg-slate-800"
+                    >
+                      {isFetchingFlight ? 'Fetching...' : 'Fetch'}
+                    </Button>
+                  </div>
+                </div>
 
                 <label className="flex flex-col gap-1">
                   <span className="text-sm text-slate-300">Time</span>

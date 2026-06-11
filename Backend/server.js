@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const userrouter = require('./routers/user');
 const datarouter = require('./routers/details');
+const flightRouter = require('./routers/flights');
 const {connectDB} = require('./connection');
 const {log, auth} = require('./middelwares');
 
@@ -31,6 +32,7 @@ app.get('/', (  req, res) => {
 
 app.use('/user', userrouter);
 app.use('/api/details',auth, datarouter);
+app.use('/api/flights', flightRouter);
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {

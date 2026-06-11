@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { GridVignetteBackground } from '@/components/ui/vignette-grid-background';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://curd-api-chc6.onrender.com';
-
 const Settings = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
